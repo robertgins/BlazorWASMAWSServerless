@@ -1,0 +1,20 @@
+﻿@page "/nonsense"
+@using BalsamicSolutions.BlazorClient.Services
+@inject StuffAndNonsenseService StuffAndNonsenseService
+
+<h3>Stuff and Nonsense</h3>
+<p>@randomSentance</p>
+<p>@randomSentances</p>
+
+<button class="btn btn-primary" @onclick="GetSentance">Get Sentance</button>
+@code {
+        //TODO create the ui for a line or lines of code
+        //     to get random sentances and display them
+    private string randomSentance = "";
+    private string[] randomSentances = new string[] { "" };
+
+    private void GetSentance()
+    {
+       
+    }
+}

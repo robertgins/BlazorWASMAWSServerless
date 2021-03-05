@@ -1,0 +1,20 @@
+Test client
+Add a post build routine to upload the Blazor cleint (powershell after file publish)
+	https://aws.amazon.com/blogs/developer/run-blazor-based-net-web-applications-on-aws-serverless/ 
+	or with the aws cli
+Add cloud front distribution for bucket to serverless.template
+Add cognito to serverless.template
+
+Clean up config files an explain them all
+Build one test "service" model (remote profile?)
+Update the appsettings files for development/production?
+
+automate build of authetication tools
+
+
+Step by step instructions
+
+Update the build to deploy all components at once ?
+https://aws.amazon.com/blogs/developer/aws-serverless-applications-with-multiple-net-core-projects/
+https://izifortune.com/serverless-website-sam-aws/
+https://app.stackery.io/

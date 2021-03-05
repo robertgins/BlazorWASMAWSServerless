@@ -1,0 +1,59 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+@using BalsamicSolutions.ApiCommon.Configuration
+
+<TelerikRootComponent>
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <div class="main">
+        <div class="top-row px-4 auth">
+            <LoginDisplay />
+        </div>
+
+        <div class="content px-4">
+            @Body
+        </div>
+    </div>
+</TelerikRootComponent>
+@code
+{
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    [JSInvokable]
+    public async Task LogoutFromInactivityTimer()
+    {
+        var settings = Settings.Instance;
+        var authState = await AuthenticationStateTask;
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            await JSRuntime.InvokeAsync<object>("sessionStorage.clear");
+
+            string logoutUrl = settings.MetaData.LogoutEndpoint;
+            string callBackUri = new Uri(Navigation.BaseUri).GetLeftPart(UriPartial.Authority).TrimEnd('/') + "/";
+            callBackUri = System.Uri.EscapeDataString(callBackUri);
+            string clientId = System.Uri.EscapeDataString(settings.CognitoClientId);
+
+            logoutUrl += $"?client_id={clientId}&logout_uri={callBackUri}";
+            Navigation.NavigateTo(logoutUrl);
+        }
+    }
+
+    [JSInvokable]
+    public async Task<bool> IsAuthenticated()
+    {
+        var authState = await AuthenticationStateTask;
+        return authState.User.Identity.IsAuthenticated;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings =Settings.Instance;
+        int timeoutInMinutes = settings.InactivityTimeoutInMinutes;
+        await JSRuntime.InvokeVoidAsync("initializeInactivityTimer", DotNetObjectReference.Create(this), timeoutInMinutes);
+    }
+
+}

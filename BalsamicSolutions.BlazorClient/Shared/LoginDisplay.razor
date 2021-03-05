@@ -1,0 +1,52 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@using System.Text.Json
+
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject BalsamicSolutions.ApiCommon.Configuration.Settings Settings
+
+<AuthorizeView>
+
+    <Authorized>
+        <button class="nav-link btn btn-link" @onclick="NavigateToProfile">Hello, @context.User.Identity.Name!</button>
+        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
+    </Authorized>
+    <NotAuthorized>
+        <a href="authentication/login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    private async Task BeginSignOut(MouseEventArgs args)
+    {
+        //TODO move this to a function
+        //Cognito does not implement a session end endpoint, so we will process the logout
+        //by ourselves.
+        //https://docs.aws.amazon.com/cognito/latest/developerguide/logout-endpoint.html
+
+        //Session storage is local to the origin, so we can naively just
+        //remove it all. The call to Cognito will log us out there so
+        //redirecting to the root of the app should take us home with
+        //us all logged out. A less naieve implemetation would call
+        //the logout url and return locally to a page that clears
+        //the session or the specific token (see Profile page) but that
+        //results in two screen redraws and thats pretty ugly
+        await JSRuntime.InvokeAsync<object>("sessionStorage.clear");
+
+        string logoutUrl = Settings.MetaData.LogoutEndpoint;
+        string callBackUri = new Uri(Navigation.BaseUri).GetLeftPart(UriPartial.Authority).TrimEnd('/') + "/";
+        callBackUri = System.Uri.EscapeDataString(callBackUri);
+        string clientId = System.Uri.EscapeDataString(Settings.CognitoClientId);
+
+        logoutUrl += $"?client_id={clientId}&logout_uri={callBackUri}";
+        Navigation.NavigateTo(logoutUrl);
+    }
+    private async Task NavigateToProfile(MouseEventArgs args)
+    {
+        Navigation.NavigateTo("/profile");
+    }
+
+}
