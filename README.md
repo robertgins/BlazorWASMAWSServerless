@@ -1,2 +1,2 @@
 # BlazorWASMAWSServerless
-Blazor WASM project with AWS Cognito authentication, Serverless API server , Cloud Front hosting with API Authorization
+Blazor WASM project with AWS Cognito authentication, Serverless API server , Cloud Front hosting with API Authorization, currently a work in progress. This project includes an AWS "Serverless" API , a Lambda for API Gateway authorization, a Lambda for Cloudfront management. A bucket to host the Blazor web assembly front end, a cloud front distribution all authenticated by AWS Cognito. Release branch forthcoming with insturctions 
