@@ -7,14 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BalsamicSolutions.ApiSupportLambdas
+namespace BalsamicSolutions.ApiCommon
 {
     /// <summary>
-    /// simple class for deserializing the Authorization header
+    /// model class for a group
     /// </summary>
-    public class Header
+    public class Group
     {
-        //--- Properties ---
-        public string Authorization { get; set; }
+        public string Description { get; set; }
+        public string Name { get; set; }
+        public string RoleArn { get; set; }
     }
 }

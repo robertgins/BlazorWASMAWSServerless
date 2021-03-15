@@ -1,0 +1,6 @@
+Build
+Deploy
+Post deploy configuration
+Cloudfront
+API Gateway
+S3 Bucket

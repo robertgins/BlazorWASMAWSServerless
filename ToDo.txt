@@ -1,3 +1,5 @@
+Should we do an inline authentication process instead, so we can control token sync?
+If we do, how do we generate tickets ?
 Test client
 Add a post build routine to upload the Blazor cleint (powershell after file publish)
 	https://aws.amazon.com/blogs/developer/run-blazor-based-net-web-applications-on-aws-serverless/ 
@@ -11,10 +13,18 @@ Update the appsettings files for development/production?
 
 automate build of authetication tools
 
-
+document cloud front distribution with custom errors and reouter script
 Step by step instructions
-
+create publish profile
 Update the build to deploy all components at once ?
 https://aws.amazon.com/blogs/developer/aws-serverless-applications-with-multiple-net-core-projects/
 https://izifortune.com/serverless-website-sam-aws/
 https://app.stackery.io/
+
+https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy.html
+dont forget to deploy the api gateway and configure options/anonymous vs just one
+
+Should we do an inline authentication process instead, so we can control token sync?
+If we do, how do we generate tickets ?
+Need a good loading screen
+Need to fix ticket reauth

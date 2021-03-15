@@ -326,41 +326,28 @@ namespace BalsamicSolutions.ApiSupportLambdas
         /// <returns></returns>
         private string ParseAuthorizationToken(APIGatewayCustomAuthorizerRequest request)
         {
-            // check if 'header' query parameter is set
-            string encodedHeader = null;
-            if (request.QueryStringParameters?.TryGetValue("header", out encodedHeader) ?? false)
+            if (null != request && null != request.Headers)
             {
-                try
+                //Chrome and Firefox send lowercase authorization headers
+                if (!request.Headers.TryGetValue("authorization", out string authorizationHeader))
                 {
-                    var header = System.Text.Json.JsonSerializer.Deserialize<Header>(Encoding.UTF8.GetString(Convert.FromBase64String(encodedHeader)));
-                    if (header.Authorization != null)
+                    request.Headers.TryGetValue("Authorization", out authorizationHeader);
+                }
+                if (!string.IsNullOrEmpty(authorizationHeader))
+                {
+                    //we have one so try to get it
+                    if (authorizationHeader.StartsWith(AuthorizationHeaderPrefix))
                     {
-                        return header.Authorization.StartsWith(AuthorizationHeaderPrefix) ? header.Authorization.Substring(AuthorizationHeaderPrefix.Length).Trim() : null;
+                        return authorizationHeader.Substring(AuthorizationHeaderPrefix.Length).Trim();
                     }
-                }
-                catch (Exception e)
-                {
-                    LogText(e, "unable to decode header");
+
+                    // not a valid 'Authorization' header value
+                    LogText("No Authorization header");
+                    return null;
                 }
             }
 
-            // convert headers to be case-insensitive
-            Dictionary<string, string> requestHeaders = new Dictionary<string, string>(request.Headers, StringComparer.InvariantCultureIgnoreCase);
-
-            // check if 'Authorization' header is set
-            if (requestHeaders.TryGetValue("Authorization", out var authorizationHeader))
-            {
-                //we have one so try to get it
-                if (authorizationHeader.StartsWith(AuthorizationHeaderPrefix))
-                {
-                    return authorizationHeader.Substring(AuthorizationHeaderPrefix.Length).Trim();
-                }
-
-                // not a valid 'Authorization' header value
-                LogText("No Authorization header");
-                return null;
-            }
-            //last resort return the actual token
+            //last resort return the actual token 
             return request.AuthorizationToken;
         }
     }

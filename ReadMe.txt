@@ -20,10 +20,13 @@ BalsamicSolutions.BlazorClient : This is the WASM Blazor client which is deliver
 Solution deployment is multi step, you have to deploy the "Serverless" application separatly from the authorizer and the 
 cloud front distribution. That will be improved later
 
+
 Authorization in the ApiServer uses standard "Authorize" attributes. We have implmented a sample authroization policy named
 "InWeatherCenter" as an example of how to use this. While this demo does not use Dynamo or S3, those services are also
-wired up as examples
+wired up as examples with the StuffAndNonsense interfaces which generate random data.
 
+In addition we have wired up a simple Cognito user manager, it supports two Cognito roles. UserAdmin and ReadOnlyUserAdmin
+These modules make use of the Telerik Blazor grid components
 
 The Blazor WebAssembly.Authentication package supports OIDC logins, AWS Cognito also supports OIDC logins, 
 both implementations are decent but both make some assumptions. The Blazor implementation assumes that the

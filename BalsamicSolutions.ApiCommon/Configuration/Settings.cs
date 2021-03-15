@@ -27,6 +27,18 @@ namespace BalsamicSolutions.ApiCommon.Configuration
         private static Settings _Settings;
         private OIDCMetaData _MetaData = null;
         private Dictionary<string, string> _RawValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        static bool _IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+        
+        /// <summary>
+        /// Mostly used to detect Lambda host
+        /// </summary>
+        public static bool IsLinux
+        {
+            get
+            {
+                return _IsLinux;
+            }
+        }
 
         /// <summary>
         /// ctor from webassembly
@@ -105,6 +117,9 @@ namespace BalsamicSolutions.ApiCommon.Configuration
             }
         }
 
+        /// <summary>
+        /// generate an AwsOptions object for use with client CTOR's
+        /// </summary>
         public AWSOptions AwsOptions
         {
             get
@@ -121,7 +136,7 @@ namespace BalsamicSolutions.ApiCommon.Configuration
         }
 
         /// <summary>
-        ///
+        ///Region
         /// </summary>
         public string AwsRegion
         {
@@ -133,7 +148,7 @@ namespace BalsamicSolutions.ApiCommon.Configuration
         }
 
         /// <summary>
-        ///
+        ///Secret
         /// </summary>
         public string AwsSecretKey
         {
@@ -165,7 +180,6 @@ namespace BalsamicSolutions.ApiCommon.Configuration
             get
             {
                 _RawValues.TryGetValue("CognitoClientId", out string returnValue);
-
                 return returnValue;
             }
         }
@@ -183,7 +197,8 @@ namespace BalsamicSolutions.ApiCommon.Configuration
         }
 
         /// <summary>
-        /// Pool URL https://cognito-idp.us-east-1.amazonaws.com/us-east-1_mSGIMVY8H
+        /// Pool URL in this format
+        /// https://cognito-idp.us-east-1.amazonaws.com/us-east-1_mSGIMVY8H
         /// </summary>
         public string CognitoPoolUrl
         {
@@ -195,7 +210,7 @@ namespace BalsamicSolutions.ApiCommon.Configuration
         }
 
         /// <summary>
-        /// client requested scopes
+        /// client requested scopes (openid, profile, etc.)
         /// </summary>
         public string[] CognitoScopes
         {
@@ -241,6 +256,9 @@ namespace BalsamicSolutions.ApiCommon.Configuration
             }
         }
 
+        /// <summary>
+        /// OIDC Metadata
+        /// </summary>
         public OIDCMetaData MetaData
         {
             get
@@ -254,6 +272,10 @@ namespace BalsamicSolutions.ApiCommon.Configuration
         /// </summary>
         public string RedirectUri { get; set; }
 
+        /// <summary>
+        /// remotly load OIDC Metadata
+        /// </summary>
+        /// <returns></returns>
         public async Task LoadOidcMetaDataAsync()
         {
             if (null == _MetaData)
@@ -264,12 +286,17 @@ namespace BalsamicSolutions.ApiCommon.Configuration
             }
         }
 
+        /// <summary>
+        /// get role or explicit credentials
+        /// </summary>
+        /// <param name="secretKey"></param>
+        /// <param name="accessKey"></param>
+        /// <returns></returns>
         private AWSCredentials GetCredentials(string secretKey, string accessKey)
         {
             if (string.IsNullOrWhiteSpace(secretKey) || string.IsNullOrWhiteSpace(accessKey))
             {
-                //This is correct for Lambda
-                return new InstanceProfileAWSCredentials();
+                return FallbackCredentialsFactory.GetCredentials();
             }
             else
             {
@@ -277,6 +304,11 @@ namespace BalsamicSolutions.ApiCommon.Configuration
             }
         }
 
+        /// <summary>
+        /// convert a name to a region end point
+        /// </summary>
+        /// <param name="awsRegion"></param>
+        /// <returns></returns>
         private RegionEndpoint GetEndPoint(string awsRegion)
         {
             if (string.IsNullOrWhiteSpace(awsRegion))

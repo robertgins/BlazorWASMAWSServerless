@@ -102,7 +102,12 @@ namespace BalsamicSolutions.ApiServer
                     o.MetadataAddress = $"{setttings.CognitoPoolUrl}/.well-known/openid-configuration";
                     o.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
+                        // Because this was done already in the Gateway Authorizer we dont
+                        // need to do any "expensive" additional validation
                         ValidateAudience = false,
+                        ValidateIssuerSigningKey = false,
+                        ValidateTokenReplay = false,
+                        ValidateLifetime = false,
                         NameClaimType = setttings.CognitoNameClaim
                     };
                 });
